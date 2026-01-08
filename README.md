@@ -1,4 +1,4 @@
-**Disclaimer: this project is 100% vibe-coded**
+**Disclaimer: this project is 100% vibe-coded. Use at your own risk ;)**
 
 # Symphony
 
