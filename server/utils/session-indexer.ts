@@ -55,6 +55,63 @@ export function clearSessionIndexCache(): void {
   cacheTimestamp = 0
 }
 
+// Project metadata for sidebar
+export interface ProjectMetadata {
+  path: string
+  displayName: string
+  sessionCount: number
+  lastActivityTimestamp: number
+}
+
+// Get list of all projects with session counts
+export async function getProjectList(): Promise<{
+  projects: ProjectMetadata[]
+  total: number
+}> {
+  const index = await getSessionIndex()
+
+  // Group sessions by project path
+  const projectMap = new Map<string, { count: number; lastActivity: number }>()
+
+  for (const session of index.values()) {
+    const filePath = getSessionFilePath(session.projectEncoded, session.id)
+    if (!(await fileExists(filePath))) continue
+
+    const existing = projectMap.get(session.projectPath)
+    if (existing) {
+      existing.count++
+      existing.lastActivity = Math.max(existing.lastActivity, session.lastMessageTimestamp)
+    } else {
+      projectMap.set(session.projectPath, {
+        count: 1,
+        lastActivity: session.lastMessageTimestamp,
+      })
+    }
+  }
+
+  // Convert to array and extract display names
+  const projects: ProjectMetadata[] = []
+  for (const [path, data] of projectMap) {
+    const segments = path.split('/')
+    const displayName = segments[segments.length - 1] || path
+
+    projects.push({
+      path,
+      displayName,
+      sessionCount: data.count,
+      lastActivityTimestamp: data.lastActivity,
+    })
+  }
+
+  // Sort by last activity (most recent first)
+  projects.sort((a, b) => b.lastActivityTimestamp - a.lastActivityTimestamp)
+
+  return {
+    projects,
+    total: projects.length,
+  }
+}
+
 // Get session list sorted by last message timestamp
 export async function getSessionList(options: {
   limit?: number

@@ -1,6 +1,6 @@
 import type { SessionMetadata, SessionListResponse } from '~/types/claude'
 
-export function useSessionIndex() {
+export function useSessionIndex(projectFilter?: Ref<string | null>) {
   const sessions = ref<SessionMetadata[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -26,6 +26,9 @@ export function useSessionIndex() {
       params.set('limit', '20')
       if (cursor.value) {
         params.set('cursor', cursor.value)
+      }
+      if (projectFilter?.value) {
+        params.set('project', projectFilter.value)
       }
 
       const response = await $fetch<SessionListResponse>(`/api/sessions?${params.toString()}`)

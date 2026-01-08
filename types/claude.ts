@@ -156,3 +156,17 @@ export interface SearchResponse {
   results: SearchResult[]
   total: number
 }
+
+// === Project Types ===
+
+export interface ProjectMetadata {
+  path: string
+  displayName: string
+  sessionCount: number
+  lastActivityTimestamp: number
+}
+
+export interface ProjectListResponse {
+  projects: ProjectMetadata[]
+  total: number
+}
