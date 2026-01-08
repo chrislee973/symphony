@@ -44,7 +44,7 @@ function scrollToBottom() {
       const rect = conversationRef.value.getBoundingClientRect()
       window.scrollTo({
         top: window.scrollY + rect.bottom - window.innerHeight,
-        behavior: 'smooth'
+        behavior: 'instant'
       })
     }
   })
@@ -100,13 +100,21 @@ async function copyCommand() {
           <span>Back to sessions</span>
         </NuxtLink>
 
-        <div v-if="metadata" class="flex items-start justify-between gap-4">
-          <div>
+        <div v-if="metadata" class="space-y-3">
+          <!-- Title row: path + date -->
+          <div class="flex items-center justify-between gap-4">
             <h1 class="text-lg font-medium text-gray-600">{{ displayPath }}</h1>
-            <p v-if="metadata.summary" class="text-gray-800 mt-1">{{ metadata.summary }}</p>
+            <div class="text-sm text-gray-500 shrink-0">
+              {{ displayDate }}
+            </div>
           </div>
-          <div class="flex items-center gap-3 shrink-0">
-            <!-- Continue in Terminal button -->
+          
+          <!-- Summary -->
+          <p v-if="metadata.summary" class="text-gray-800">{{ metadata.summary }}</p>
+          
+          <!-- Action buttons -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <!-- Resume in iTerm button -->
             <button
               @click="openInTerminal"
               :disabled="openingTerminal"
@@ -115,29 +123,25 @@ async function copyCommand() {
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>{{ openingTerminal ? 'Opening...' : 'Continue' }}</span>
+              <span>{{ openingTerminal ? 'Opening...' : 'Resume in iTerm' }}</span>
             </button>
-            <!-- Copy command button -->
+            <!-- Copy command to resume in terminal -->
             <button
               @click="copyCommand"
-              class="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
-              title="Copy resume command"
+              class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 flex items-center gap-1.5 transition-colors"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
+              <span>Copy command to resume in terminal</span>
             </button>
             <button
               v-if="messages.length > 0"
               @click="scrollToBottom"
               class="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 flex items-center gap-1 transition-colors"
             >
-              <span>Bottom</span>
-              <span>↓</span>
+              <span>Scroll to Bottom ↓</span>
             </button>
-            <div class="text-sm text-gray-500">
-              {{ displayDate }}
-            </div>
           </div>
         </div>
 

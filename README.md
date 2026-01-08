@@ -9,6 +9,7 @@ A web-based browser living in localhost for your Claude Code conversation histor
 - Browse all Claude Code sessions sorted by recency
 - Full-text search across conversations
 - Live view of ongoing sessions
+- Resume any session in iTerm with one click, or copy the CLI command
 - Markdown rendering with support for thinking blocks, tool calls, and context compaction
 
 ## Requirements & Assumptions
