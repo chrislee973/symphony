@@ -246,6 +246,28 @@ Tool results are NOT shown as separate messages. Instead:
 
 If you need to explore the raw session data for a specific feature:
 
+### ⚠️ Large File Warning
+
+Session files may contain **base64-encoded images** that span 1+ MB on a single line. Running `head`, `cat`, or `tail` directly can hang your terminal or Claude Code.
+
+**Safe patterns:**
+```bash
+# Always truncate lines
+head -20 "$SESSION" | cut -c1-500
+
+# Strip base64 data before viewing
+sed 's/"data":"[^"]*"/"data":"[TRUNCATED]"/g' "$SESSION" | head -20
+
+# Check max line length first (>50KB = use truncation)
+wc -L "$SESSION"
+
+# Use the safe-jsonl helper (if installed at ~/.claude/bin/)
+safe-jsonl head "$SESSION" 10
+safe-jsonl stats "$SESSION"
+```
+
+**Avoid:** `cat`, `head`, `tail`, `grep` without output limiting on raw session files.
+
 ### Find Session Files
 ```bash
 # List all project directories

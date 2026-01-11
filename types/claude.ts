@@ -7,6 +7,15 @@ export interface TextContent {
   text: string
 }
 
+export interface ImageContent {
+  type: 'image'
+  source: {
+    type: 'base64'
+    media_type: string
+    data: string
+  }
+}
+
 export interface ThinkingContent {
   type: 'thinking'
   thinking: string
@@ -26,6 +35,9 @@ export interface ToolResultItem {
   content: string | Array<{ type: 'text'; text: string }>
   is_error?: boolean
 }
+
+// User message content can be a string, tool results, or mixed content (text + images)
+export type UserContentBlock = ToolResultItem | TextContent | ImageContent
 
 export type AssistantContentBlock = TextContent | ThinkingContent | ToolUseContent
 
@@ -47,7 +59,7 @@ export interface UserMessage extends BaseMessage {
   userType?: 'external'
   message: {
     role: 'user'
-    content: string | ToolResultItem[]
+    content: string | UserContentBlock[]
   }
   toolUseResult?: {
     stdout?: string

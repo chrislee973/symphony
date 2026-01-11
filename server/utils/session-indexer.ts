@@ -129,9 +129,9 @@ export async function getSessionList(options: {
   // Convert to array and filter
   let sessions = Array.from(index.values())
 
-  // Filter by project if specified
+  // Filter by project if specified (exact match)
   if (projectFilter) {
-    sessions = sessions.filter((s) => s.projectPath.includes(projectFilter))
+    sessions = sessions.filter((s) => s.projectPath === projectFilter)
   }
 
   // Filter out sessions whose files don't exist

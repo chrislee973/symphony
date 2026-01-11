@@ -48,10 +48,14 @@ const toolResults = computed(() => {
   return results;
 });
 
-// Check if a message is a tool result (to skip in rendering)
-function isToolResultMessage(msg: UserMessage | AssistantMessage): boolean {
+// Check if a message is ONLY tool results (no user text or images)
+// These are skipped because tool results are shown inline with tool calls
+function isToolResultOnlyMessage(msg: UserMessage | AssistantMessage): boolean {
   if (msg.type !== "user") return false;
-  return Array.isArray(msg.message.content);
+  const content = msg.message.content;
+  if (!Array.isArray(content)) return false;
+  // Skip only if ALL items are tool_result type (no text or images from user)
+  return content.every(item => item.type === "tool_result");
 }
 </script>
 
@@ -64,7 +68,7 @@ function isToolResultMessage(msg: UserMessage | AssistantMessage): boolean {
       <template v-if="msg.type === 'summary'">
         <ContextCompactionDivider />
       </template>
-      <template v-else-if="!isToolResultMessage(msg)">
+      <template v-else-if="!isToolResultOnlyMessage(msg)">
         <MessageBubble :message="msg" :tool-results="toolResults" />
       </template>
     </template>

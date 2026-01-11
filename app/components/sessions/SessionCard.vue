@@ -3,6 +3,11 @@ import type { SessionMetadata } from '~/types/claude'
 
 const props = defineProps<{
   session: SessionMetadata
+  isSelected?: boolean
+}>()
+
+const emit = defineEmits<{
+  select: [sessionId: string]
 }>()
 
 // Shorten project path for display
@@ -43,12 +48,21 @@ const preview = computed(() => {
   const text = props.session.firstUserMessage || props.session.summary || 'No preview available'
   return text.length > 120 ? text.slice(0, 120) + '...' : text
 })
+
+function handleClick() {
+  emit('select', props.session.id)
+}
 </script>
 
 <template>
-  <NuxtLink
-    :to="`/sessions/${session.id}`"
-    class="block p-4 border border-gray-200 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
+  <button
+    @click="handleClick"
+    :class="[
+      'w-full text-left p-4 border rounded-lg transition-colors cursor-pointer',
+      isSelected
+        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+        : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+    ]"
   >
     <div class="flex items-start justify-between gap-4">
       <div class="flex-1 min-w-0">
@@ -62,5 +76,5 @@ const preview = computed(() => {
         <span>{{ session.messageCount }} msgs</span>
       </div>
     </div>
-  </NuxtLink>
+  </button>
 </template>

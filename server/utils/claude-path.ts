@@ -18,8 +18,11 @@ export function getHistoryPath(): string {
 
 // Encode a project path to the directory name format
 // /Users/foo/bar -> -Users-foo-bar
+// Claude CLI also converts underscores to dashes when creating project directories,
+// so we must do the same here to correctly locate session files on disk.
+// e.g. /path/to/_backup -> -path-to--backup (not -path-to-_backup)
 export function encodeProjectPath(projectPath: string): string {
-  return projectPath.replace(/\//g, '-')
+  return projectPath.replace(/\//g, '-').replace(/_/g, '-')
 }
 
 // Decode a directory name back to project path

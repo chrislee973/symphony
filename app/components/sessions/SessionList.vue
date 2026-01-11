@@ -5,10 +5,12 @@ const props = defineProps<{
   sessions: SessionMetadata[]
   loading: boolean
   hasMore: boolean
+  selectedSessionId?: string | null
 }>()
 
 const emit = defineEmits<{
   loadMore: []
+  select: [sessionId: string]
 }>()
 
 // Intersection observer for infinite scroll
@@ -32,11 +34,21 @@ onMounted(() => {
     observer.disconnect()
   })
 })
+
+function handleSelect(sessionId: string) {
+  emit('select', sessionId)
+}
 </script>
 
 <template>
   <div class="space-y-3">
-    <SessionCard v-for="session in sessions" :key="session.id" :session="session" />
+    <SessionCard
+      v-for="session in sessions"
+      :key="session.id"
+      :session="session"
+      :is-selected="session.id === selectedSessionId"
+      @select="handleSelect"
+    />
 
     <!-- Load more trigger -->
     <div ref="loadMoreTrigger" class="h-10 flex items-center justify-center">

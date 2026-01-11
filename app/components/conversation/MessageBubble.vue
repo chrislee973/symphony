@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserMessage, AssistantMessage, TextContent, ThinkingContent, ToolUseContent } from '~/types/claude'
+import type { UserMessage, AssistantMessage, TextContent, ThinkingContent, ToolUseContent, ImageContent } from '~/types/claude'
 
 const props = defineProps<{
   message: UserMessage | AssistantMessage
@@ -13,14 +13,20 @@ const userText = computed(() => {
   if (props.message.type !== 'user') return ''
   const content = props.message.message.content
   if (typeof content === 'string') return content
-  // Tool result - show brief summary
-  return '[Tool result]'
+  // Array content - extract text blocks
+  const textBlocks = content.filter((item): item is TextContent => item.type === 'text')
+  if (textBlocks.length > 0) {
+    return textBlocks.map(block => block.text).join('\n')
+  }
+  return ''
 })
 
-// Check if this is a tool result message
-const isToolResult = computed(() => {
-  if (props.message.type !== 'user') return false
-  return Array.isArray(props.message.message.content)
+// Extract images from user message
+const userImages = computed(() => {
+  if (props.message.type !== 'user') return []
+  const content = props.message.message.content
+  if (typeof content === 'string') return []
+  return content.filter((item): item is ImageContent => item.type === 'image')
 })
 
 // Extract content blocks from assistant message
@@ -46,8 +52,7 @@ function getToolResult(toolUseId: string): string | undefined {
 </script>
 
 <template>
-  <!-- Skip tool result messages in the UI (they're shown inline with tool calls) -->
-  <div v-if="!isToolResult" class="flex gap-3" :class="isUser ? 'justify-end' : 'justify-start'">
+  <div class="flex gap-3" :class="isUser ? 'justify-end' : 'justify-start'">
     <div
       :class="[
         'max-w-[85%] rounded-lg',
@@ -56,7 +61,17 @@ function getToolResult(toolUseId: string): string | undefined {
     >
       <!-- User message -->
       <template v-if="isUser">
-        <p class="whitespace-pre-wrap">{{ userText }}</p>
+        <p v-if="userText" class="whitespace-pre-wrap">{{ userText }}</p>
+        <!-- User attached images -->
+        <div v-if="userImages.length > 0" class="mt-2 space-y-2">
+          <img
+            v-for="(img, i) in userImages"
+            :key="`img-${i}`"
+            :src="`data:${img.source.media_type};base64,${img.source.data}`"
+            class="max-w-full rounded-md"
+            alt="User attached image"
+          />
+        </div>
       </template>
 
       <!-- Assistant message -->
